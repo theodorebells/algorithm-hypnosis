@@ -35,17 +35,17 @@ const featuresData = [
     {
         icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />,
         title: "The Viral Loop",
-        description: "Engineer content that shares itself. Create feedback loops that amplify reach exponentially without extra effort."
+        description: "Create content that doesn't just get viewed, but shared. Turn every follower into a distribution channel for your brand."
     },
     {
-        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />,
+        icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />,
         title: "Neuro-Hooking",
-        description: "Scientific structure for the first 3 seconds of any video or post. Grip the reptilian brain immediately."
+        description: "The specific science of the first 3 seconds. How to trigger an immediate dopamine response that makes scrolling impossible."
     },
     {
         icon: <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />,
         title: "Shadowban Immunity",
-        description: "Navigate the algorithm's safety nets. Learn exactly what triggers suppression and how to stay in the spotlight."
+        description: "Navigate the dangerous waters of algorithm censorship. Learn exactly what words trigger reach restriction and how to bypass them."
     }
 ];
 
@@ -57,31 +57,39 @@ interface FeatureCardProps {
 }
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description, index }) => (
-    <div className="glass-panel p-8 rounded-3xl hover:bg-white/10 transition-all duration-300 group relative overflow-hidden border border-white/5">
+    <div className="glass-panel p-8 rounded-3xl hover:bg-white/10 transition-all duration-300 group relative overflow-hidden border border-white/5 min-w-[85vw] md:min-w-0 snap-center flex flex-col h-full">
         <div className="absolute -right-10 -top-10 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-colors"></div>
         
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-900/50 to-indigo-900/50 border border-white/10 flex items-center justify-center mb-6 text-purple-300 group-hover:text-white group-hover:scale-110 transition-all duration-300 shadow-lg shadow-purple-900/20">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-900/50 to-indigo-900/50 border border-white/10 flex items-center justify-center mb-6 text-purple-300 group-hover:text-white group-hover:scale-110 transition-all duration-300 shadow-lg shadow-purple-900/20 flex-shrink-0">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {icon}
             </svg>
         </div>
         <h3 className="text-xl font-serif font-bold text-white mb-3">{title}</h3>
-        <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
+        <p className="text-gray-400 text-sm leading-relaxed flex-grow">{description}</p>
     </div>
 );
 
 const Features: React.FC = () => {
     return (
-        <section className="py-24 px-4 md:px-8">
+        <section className="py-24 px-0 md:px-8 overflow-hidden">
             <div className="container mx-auto max-w-6xl">
-                <div className="text-center mb-16">
+                <div className="text-center mb-12 px-4">
                     <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6 text-white">Inside The System</h2>
                     <p className="text-gray-400 max-w-2xl mx-auto">This isn't just a book. It's a toolkit for dominating the attention economy.</p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {/* Mobile: Horizontal Scroll / Desktop: 3x3 Grid */}
+                <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-6 px-4 md:px-0 pb-8 md:pb-0 scrollbar-hide">
                     {featuresData.map((feature, index) => (
                         <FeatureCard key={index} {...feature} index={index} />
+                    ))}
+                </div>
+                
+                {/* Mobile Swipe Indicator */}
+                <div className="flex justify-center md:hidden gap-2 mt-2">
+                    {featuresData.map((_, i) => (
+                        <div key={i} className={`w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/20'}`}></div>
                     ))}
                 </div>
             </div>

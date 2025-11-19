@@ -6,7 +6,7 @@ const CountdownTimer: React.FC = () => {
     const [isExpired, setIsExpired] = useState(false);
 
     useEffect(() => {
-        const BONUS_DURATION = 30 * 60 * 1000;
+        const BONUS_DURATION = 10 * 60 * 1000;
         let expiryTime = localStorage.getItem('bonusExpiry');
         
         if (!expiryTime) {
