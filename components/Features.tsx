@@ -1,5 +1,6 @@
 
 import React from 'react';
+import FadeIn from './FadeIn';
 
 const featuresData = [
     {
@@ -75,14 +76,18 @@ const Features: React.FC = () => {
         <section className="py-24 px-0 md:px-8 overflow-hidden">
             <div className="container mx-auto max-w-6xl">
                 <div className="text-center mb-12 px-4">
-                    <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6 text-white">Inside The System</h2>
-                    <p className="text-gray-400 max-w-2xl mx-auto">This isn't just a book. It's a toolkit for dominating the attention economy.</p>
+                    <FadeIn variant="blur" duration={1000}>
+                        <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6 text-white">Inside The System</h2>
+                        <p className="text-gray-400 max-w-2xl mx-auto">This isn't just a book. It's a toolkit for dominating the attention economy.</p>
+                    </FadeIn>
                 </div>
                 
                 {/* Mobile: Horizontal Scroll / Desktop: 3x3 Grid */}
                 <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-6 px-4 md:px-0 pb-8 md:pb-0 scrollbar-hide">
                     {featuresData.map((feature, index) => (
-                        <FeatureCard key={index} {...feature} index={index} />
+                        <FadeIn key={index} delay={index * 100} variant="pop" className="h-full">
+                            <FeatureCard {...feature} index={index} />
+                        </FadeIn>
                     ))}
                 </div>
                 

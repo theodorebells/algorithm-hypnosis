@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import FadeIn from './FadeIn';
 
 interface FaqItemProps {
     question: string;
@@ -63,21 +64,25 @@ const Faq: React.FC = () => {
              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full bg-purple-900/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
 
             <div className="container mx-auto max-w-4xl">
-                <h2 className="font-serif text-4xl md:text-5xl font-bold text-white mb-12 text-center">Frequently Asked Questions</h2>
+                <FadeIn variant="fade-up">
+                    <h2 className="font-serif text-4xl md:text-5xl font-bold text-white mb-12 text-center">Frequently Asked Questions</h2>
+                </FadeIn>
                 
                 {/* Unified Glass Panel styling, removed inner opaque div */}
-                <div className="glass-panel rounded-3xl p-6 md:p-12 border border-white/10 hover:border-white/20 transition-colors duration-500">
-                    {faqData.map((item, index) => (
-                        <FaqItem
-                            key={index}
-                            question={item.question}
-                            answer={item.answer}
-                            isOpen={openIndex === index}
-                            onClick={() => handleToggle(index)}
-                            isLast={index === faqData.length - 1}
-                        />
-                    ))}
-                </div>
+                <FadeIn delay={200} variant="fade-up">
+                    <div className="glass-panel rounded-3xl p-6 md:p-12 border border-white/10 hover:border-white/20 transition-colors duration-500">
+                        {faqData.map((item, index) => (
+                            <FaqItem
+                                key={index}
+                                question={item.question}
+                                answer={item.answer}
+                                isOpen={openIndex === index}
+                                onClick={() => handleToggle(index)}
+                                isLast={index === faqData.length - 1}
+                            />
+                        ))}
+                    </div>
+                </FadeIn>
             </div>
         </section>
     );
