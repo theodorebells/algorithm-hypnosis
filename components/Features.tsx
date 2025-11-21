@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import FadeIn from './FadeIn';
 
 const featuresData = [
@@ -54,27 +54,83 @@ interface FeatureCardProps {
     icon: React.ReactNode;
     title: string;
     description: string;
-    index: number;
+    isActive: boolean;
+    onClick?: () => void;
 }
 
-const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description, index }) => (
-    <div className="glass-panel p-8 rounded-3xl hover:bg-white/10 transition-all duration-300 group relative overflow-hidden border border-white/5 min-w-[85vw] md:min-w-0 snap-center flex flex-col h-full">
-        <div className="absolute -right-10 -top-10 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-colors"></div>
+const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description, isActive, onClick }) => (
+    <div 
+        onClick={onClick}
+        className={`glass-panel p-8 rounded-3xl transition-all duration-500 group relative overflow-hidden border flex-shrink-0 w-[85vw] md:w-[380px] snap-center flex flex-col h-full cursor-pointer
+        ${isActive 
+            ? 'border-purple-500 shadow-[0_0_30px_-10px_rgba(168,85,247,0.5)] opacity-100 scale-100 z-10 bg-white/10' 
+            : 'border-white/5 opacity-50 scale-95 bg-transparent hover:opacity-70'}`}
+    >
+        {isActive && (
+            <div className="absolute -right-10 -top-10 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl transition-colors animate-pulse"></div>
+        )}
         
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-900/50 to-indigo-900/50 border border-white/10 flex items-center justify-center mb-6 text-purple-300 group-hover:text-white group-hover:scale-110 transition-all duration-300 shadow-lg shadow-purple-900/20 flex-shrink-0">
+        <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center mb-6 transition-all duration-500 shadow-lg flex-shrink-0
+            ${isActive 
+                ? 'bg-purple-900/50 border-purple-400 text-white scale-110' 
+                : 'bg-white/5 border-white/10 text-purple-300/70'}`}>
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {icon}
             </svg>
         </div>
-        <h3 className="text-xl font-serif font-bold text-white mb-3">{title}</h3>
+        <h3 className={`text-xl font-serif font-bold mb-3 transition-colors duration-300 ${isActive ? 'text-white' : 'text-gray-400'}`}>{title}</h3>
         <p className="text-gray-400 text-sm leading-relaxed flex-grow">{description}</p>
     </div>
 );
 
 const Features: React.FC = () => {
+    const [activeIndex, setActiveIndex] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // Automatic scroll timer
+    useEffect(() => {
+        if (isPaused) return;
+
+        const interval = setInterval(() => {
+            setActiveIndex((current) => (current + 1) % featuresData.length);
+        }, 2000);
+
+        return () => clearInterval(interval);
+    }, [isPaused]);
+
+    // Sync scroll position with active index to CENTER the card
+    useEffect(() => {
+        if (containerRef.current) {
+            const container = containerRef.current;
+            const cards = Array.from(container.children) as HTMLElement[];
+            const activeCard = cards[activeIndex];
+
+            if (activeCard) {
+                // Calculate scroll position to center the card
+                // scrollLeft = card.offsetLeft - (containerWidth / 2) + (cardWidth / 2)
+                const scrollLeft = activeCard.offsetLeft - (container.clientWidth / 2) + (activeCard.clientWidth / 2);
+                
+                container.scrollTo({
+                    left: scrollLeft,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    }, [activeIndex]);
+
     return (
         <section className="py-24 px-0 md:px-8 overflow-hidden">
-            <div className="container mx-auto max-w-6xl">
+            <style>{`
+                .hide-scrollbar::-webkit-scrollbar {
+                    display: none;
+                }
+                .hide-scrollbar {
+                    -ms-overflow-style: none;
+                    scrollbar-width: none;
+                }
+            `}</style>
+            <div className="container mx-auto max-w-7xl">
                 <div className="text-center mb-12 px-4">
                     <FadeIn variant="blur" duration={1000}>
                         <h2 className="font-serif text-4xl md:text-5xl font-bold mb-6 text-white">Inside The System</h2>
@@ -82,19 +138,38 @@ const Features: React.FC = () => {
                     </FadeIn>
                 </div>
                 
-                {/* Mobile: Horizontal Scroll / Desktop: 3x3 Grid */}
-                <div className="flex overflow-x-auto snap-x snap-mandatory md:grid md:grid-cols-3 gap-6 px-4 md:px-0 pb-8 md:pb-0 scrollbar-hide">
-                    {featuresData.map((feature, index) => (
-                        <FadeIn key={index} delay={index * 100} variant="pop" className="h-full">
-                            <FeatureCard {...feature} index={index} />
-                        </FadeIn>
-                    ))}
-                </div>
-                
-                {/* Mobile Swipe Indicator */}
-                <div className="flex justify-center md:hidden gap-2 mt-2">
+                {/* Auto-Scrolling Carousel */}
+                <FadeIn variant="fade-up" delay={200}>
+                    <div 
+                        ref={containerRef}
+                        className="flex overflow-x-auto gap-6 px-4 md:px-12 py-12 hide-scrollbar snap-x snap-mandatory items-center"
+                        onMouseEnter={() => setIsPaused(true)}
+                        onMouseLeave={() => setIsPaused(false)}
+                        onTouchStart={() => setIsPaused(true)} // Pause on touch drag
+                        onTouchEnd={() => setIsPaused(false)}
+                    >
+                        {featuresData.map((feature, index) => (
+                            <FeatureCard 
+                                key={index} 
+                                {...feature} 
+                                isActive={index === activeIndex}
+                                onClick={() => setActiveIndex(index)}
+                            />
+                        ))}
+                        {/* Spacer to ensure nice padding at end if needed */}
+                        <div className="w-1 md:w-12 flex-shrink-0"></div>
+                    </div>
+                </FadeIn>
+
+                {/* Navigation Dots */}
+                <div className="flex justify-center gap-2 mt-0">
                     {featuresData.map((_, i) => (
-                        <div key={i} className={`w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/20'}`}></div>
+                        <button 
+                            key={i} 
+                            onClick={() => setActiveIndex(i)}
+                            className={`h-1.5 rounded-full transition-all duration-300 ${i === activeIndex ? 'w-8 bg-purple-500' : 'w-2 bg-gray-700 hover:bg-gray-500'}`}
+                            aria-label={`Go to feature ${i + 1}`}
+                        />
                     ))}
                 </div>
             </div>
@@ -103,3 +178,4 @@ const Features: React.FC = () => {
 };
 
 export default Features;
+    
